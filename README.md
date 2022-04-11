@@ -16,7 +16,7 @@ I was trying to make it for anyone without a technical background to pick it up 
 ![The App's SQL Schema screenshot from MySQL Workbench](https://github.com/rardlc/ACMEFood/blob/main/public/ACMEFoodSchema.png)
 
 
-Once you have the NodeJS and .NET framework installed and the mySQL ACMEFood database running in the background, execute from the root directory:
+Once you have NodeJS, the .NET framework installed and the mySQL ACMEFood database running in the background, execute from the root directory:
 
     npx next dev --port 3001
     node ./DB/dbServer.js
