@@ -1,0 +1,596 @@
+
+
+.subtotal {
+  color: #009b62;
+  margin-top: auto;
+  margin-bottom: auto;
+  font-size: xx-large;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer {
+  height: 100px;
+  border-top: 1px solid #eaeaea;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.footer a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+}
+
+.title a {
+  color: #00d084;
+  text-decoration: none;
+}
+
+.title a:hover,
+.title a:focus,
+.title a:active {
+  text-decoration: underline;
+}
+
+.title {
+  margin: 0;
+  line-height: 1.15;
+  font-size: 3rem;
+}
+
+.title,
+.description {
+  text-align: center;
+}
+
+.description {
+  margin-top: 0;
+  padding: 0;
+}
+
+.growingHSpace {
+  display: flex;
+  flex-grow: 2;
+  width: 100%;
+}
+
+.textBtn {
+  margin-top: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  color:#009b62;
+  cursor: pointer;
+}
+.textBtn:hover {
+  color: #18B482;
+  border-color: #18B482;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.code {
+  background: #fafafa;
+  border-radius: 5px;
+  padding: 0.75rem;
+  font-family: Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono,
+    Bitstream Vera Sans Mono, Courier New, monospace;
+}
+
+.slidingView {
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+}
+
+.subpage {
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.slidingContent1 {
+  display: flex;
+  flex-flow: row nowrap;
+  transform: translateX(0px);
+  transition: all 0.5s ease;
+  width: max-content;
+  }
+
+.slidingContent2 {
+  display: flex;
+  flex-flow: row nowrap;
+  transition: all 0.5s ease;
+  width: max-content;
+
+  }
+
+.slidingContent3 {
+  display: flex;
+  flex-flow: row nowrap;
+  transition: all 0.5s ease;
+  width: max-content;
+
+  }
+
+  .slidingContent4 {
+    display: flex;
+    flex-flow: row nowrap;
+    transition: all 0.5s ease;
+    width: max-content;
+
+  }
+
+  .slidingContent5 {
+    display: flex;
+    flex-flow: row nowrap;
+    transition: all 0.5s ease;
+    width: max-content;
+  }
+
+  .slidingContent6 {
+    display: flex;
+    flex-flow: row nowrap;
+    transition: all 0.5s ease;
+    width: max-content;
+  }
+
+  .slidingContent7 {
+    display: flex;
+    flex-flow: row nowrap;
+    transition: all 0.5s ease;
+    width: max-content;
+  }
+
+  .slidingContent8 {
+    display: flex;
+    flex-flow: row nowrap;
+    transition: all 0.5s ease;
+    width: max-content;
+  }
+.grid {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+.money {
+  color: #00d084
+}
+
+.money.active {
+  color: white;
+}
+
+.active.money {
+  color: white
+}
+
+.active {
+  background-color: #18B482;
+  color: white !important;
+  font: inherit;
+}
+
+.formCard button {
+  background: #fafafa;
+  padding: 0.5em;
+  border-radius: 5px;
+  outline: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.formCard button:hover {
+  color: #18B482;
+  border-color: #18B482;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.invalidText {
+  color: red;
+  font-size: small;
+  display: block;
+  width: 100%;
+  white-space: pre-wrap;
+}
+.disabled {
+  color:lightgray;
+}
+.disabled select{
+  color:lightgray;
+}
+
+.formCard p {
+  margin-bottom: 0%;
+  margin-top: 0%;
+}
+
+.inputCol {
+  display: flex;
+  flex-flow: column wrap;
+  margin-top: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.inputCell {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.center {
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+  display: block;
+}
+
+.required {
+  color: red
+}
+
+.card {
+  margin: auto;
+  padding: 1.2rem;
+  text-align: left;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.visibleBorder {
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+}
+
+.opacityOn {
+  opacity:100%;
+}
+
+.opacityOff{
+  opacity: 0%;
+}
+
+.card:hover,
+.card:focus,
+.card:active {
+  border-color: #00d084;
+  color: #00d084;
+}
+
+.fullCard {
+  margin: 0.5rem;
+  padding: 1.5rem;
+  text-align: left;
+  text-decoration: none;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  width: 95%;
+  height: fit-content;
+  flex-grow: 0;
+}
+
+.fullCard p {
+  margin:0;
+}
+.fullCard h2 {
+  margin:0;
+}
+
+.fullCard:hover,
+.fullCard:focus,
+.fullCard:active {
+  color: #00d084;
+  border-color: #00d084;
+}
+
+.formCard {
+  margin: 0.5rem;
+    padding: 1rem;
+    text-align: left;
+    text-decoration: none;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    transition: border-color 0.15s ease, all 1s;
+    opacity: 1;
+}
+
+.disappear {
+  transition: all 2s ease;
+  transform: translateX(-200vw);
+  border: 1px solid white;
+}
+
+.disappear > .centerInputs {
+  opacity: 0;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+  height: 0;
+}
+
+.overviewIcon {
+  font-size: 2rem;
+}
+
+.sameLineSpaced{
+  margin-right: 5rem;
+}
+
+.navButton {
+    margin: 1rem;
+    float: left;
+    text-align: center;
+    color: inherit;
+    text-decoration: none;
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    font-weight: bold;
+    background-color:#fafafa;
+    width: 40%;
+  }
+
+.navButton:hover {
+  color: #00d084;
+  border-color: #00d084;
+  transition: all 0.5s ease;
+}
+
+
+.navBttnDiv {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+
+.centerInputs {
+  display: flex;
+  flex-flow: column wrap;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.optionPill {
+  border-radius: 5px;
+  border: solid #eaeaea 1px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  overflow: hidden;
+  height: 2rem;
+  width: 100%;
+}
+
+.optionPill div + div {
+  border-left: solid #eaeaea 1px;
+  width: 100%;
+
+}
+
+.optionPill div {
+  text-align: center;
+  padding: 0.2em;
+  width: 100%;
+}
+
+.optionPill div:hover {
+  background: #00d084;
+  color: white;
+  cursor: pointer;
+}
+
+
+
+.sectionDivider {
+  margin-top: 5%;
+  margin-left: 2%;
+  margin-right: 2%;
+}
+
+.card h2 {
+  margin: 0 0 1rem 0;
+}
+
+.card p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.logo {
+  height: 1em;
+  margin-left: 0.5rem;
+}
+
+/* Tooltip container */
+.tooltip {
+  position: relative;
+  display: inline-block;
+
+  outline: #eaeaea solid 1px;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  border-radius: 200px;
+
+  padding-right: 0.3rem;
+  padding-left: 0.3rem;
+
+  margin-bottom: 2rem;
+  margin-right: 1rem;
+  margin-left: 0.2rem;
+  font-size: 0.6rem;
+  color: gray
+
+}
+
+/* Tooltip text */
+.tooltip .tooltipText {
+  visibility: hidden;
+  width: 120px;
+  background-color: #0f0f0f;
+  color: #eaeaea;
+  padding: 5px;
+  border-radius: 6px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.tooltip:hover .tooltipText {
+  visibility: visible;
+}
+
+.tooltip .tooltipText::after {
+  content: " ";
+  position: absolute;
+  top: 100%; /* At the bottom of the tooltip */
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+@media (max-width: 600px) {
+  .viewGrid {
+    flex-direction: column;
+  }
+}
+
+.textInput{
+  margin-bottom: 0.8rem;
+}
+
+
+.textInput:active,
+.textInput:focus{
+  border-top: 0px white solid;
+  border-left: 0px white solid;
+  border-right: 0px white solid;
+  border-bottom: 3px #00d084 solid;
+  transition: all 0.25s ease;
+  outline: none;
+}
+
+/* wide screen */
+@media screen and (min-width: 600px) {
+  .slidingView {
+    width: 600px;
+  }
+
+  .viewGrid {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 600px;
+  }
+
+  .slidingContent1 {
+    transform: translateX(0vw);
+  }
+
+  .slidingContent2 {
+    transform: translateX(-600px);
+  }
+
+  .slidingContent3 {
+    transform: translateX(-1200px);
+  }
+
+  .slidingContent4 {
+    transform: translateX(-1800px);
+  }
+
+  .slidingContent5 {
+    transform: translateX(-2400px);
+  }
+
+  .slidingContent6 {
+    transform: translateX(-3000px);
+  }
+
+  .slidingContent7 {
+    transform: translateX(-3600px);
+  }
+
+  .slidingContent8 {
+    transform: translateX(-4200px);
+  }
+
+}
+
+
+
+/* small screens specificities */
+@media screen and (max-width: 600px) {
+  .slidingView {
+    width: 100vw;
+  }
+
+
+
+  .viewGrid {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 100vw;
+  }
+
+
+  .optionPill{
+    flex-direction: column;
+    height: max-content;
+  }
+
+  .optionPill div{
+    outline:#eaeaea 1px solid;
+    padding: 10px;
+  }
+
+  .slidingContent1 {
+    transform: translateX(0);
+  }
+
+  .slidingContent2 {
+    transform: translateX(-100vw);
+  }
+
+  .slidingContent3 {
+    transform: translateX(-200vw);
+  }
+
+  .slidingContent4 {
+    transform: translateX(-300vw);
+  }
+
+  .slidingContent5 {
+    transform: translateX(-400vw);
+  }
+
+  .slidingContent6 {
+    transform: translateX(-500vw);
+  }
+
+  .slidingContent7 {
+    transform: translateX(-600vw);
+  }
+
+  .slidingContent8 {
+    transform: translateX(-700vw);
+  }
+}

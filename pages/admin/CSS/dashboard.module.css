@@ -1,0 +1,33 @@
+
+/* on a wide screen */
+.topbar {
+    display: flex;
+    flex-flow: row wrap;
+    min-height: 10vh;
+    background: rgba(17, 16, 16, 0.856);
+    justify-content: center;
+    align-items: center;
+    
+}
+.topbar a {
+    color: white;
+
+}
+
+.topbarActive{
+    color: #00d084 !important;
+}
+
+.topbarOption {
+
+}
+
+
+.topbarOption {
+    padding: 1rem;
+    font-size: 1.2rem;
+}
+
+
+
+

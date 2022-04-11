@@ -1,0 +1,30 @@
+
+@media screen and (min-width: 900px) {
+  .mealContainer span {
+    font-size: 1rem;
+  }
+  .mealContainer span input[type="number"] {
+    font-size: 1rem;
+  }
+  .mealNumber {
+    width: 49.5px;
+    margin: 0.5rem 0.3rem 0.3rem 0.3rem;
+    box-sizing: border-box;
+  }
+}
+/* small screens */
+@media screen and (max-width: 600px) {
+  .mealContainer span {
+    margin-right: 100%;
+    font-size: 1.5rem;
+  }
+  .mealContainer span input[type="number"] {
+    font-size: 1.5rem;
+  }
+  .mealNumber {
+    width: 100px;
+    padding: 0.8rem ;
+    margin: 0.8rem 0.5rem 0.5rem 0.5rem;
+    box-sizing: border-box;
+  }
+}
