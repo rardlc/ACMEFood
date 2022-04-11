@@ -11,9 +11,9 @@ I was trying to make it for anyone without a technical background to pick it up 
 ## Requirements and Installation
 -  [.NET ](https://dotnet.microsoft.com/en-us/download) \>= 5 (for the .docx formatting)
 - [NodeJS](https://nodejs.org/en/) \>= 12.x
--	MySQL Schema below
+-	[SQL Schema](https://github.com/rardlc/ACMEFood/blob/main/DB/createACMEFoodSchema.sql)
 
-![The App's SQL Schema screenshot from MySQL Workbench](https://github.com/rardlc/ACMEFood/blob/dev/ACMEfoodSchema.png?raw=true)
+![The App's SQL Schema screenshot from MySQL Workbench](https://github.com/rardlc/ACMEFood/blob/main/public/ACMEFoodSchema.png)
 
 
 Once you have the NodeJS and .NET framework installed and the mySQL ACMEFood database running in the background, execute from the root directory:
