@@ -1,0 +1,75 @@
+.container {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    flex-flow: row, wrap;
+}
+
+.sidebar {
+    min-height: 100vh;
+    border-right: #00d084 1px solid;
+    min-width: 10%;
+}
+
+.sidebarOption {
+    padding: 1rem;
+    border-bottom: #00d084 1px solid;
+    
+}
+
+.active {
+    background-color: #00d084;
+    color: white
+}
+
+
+.mainView {
+    padding: 1rem;
+}
+
+.appLogo {
+    display: flex;
+    flex-flow: column wrap;
+}
+
+.addClientBtn span{
+    outline: 1px solid #00d084;
+    border-radius: 100px;
+    padding: 0.5rem;
+    margin: 0.5rem;
+}
+
+.visible {
+    display: flex;
+}
+
+.hide {
+    display: none;
+}
+
+.clientForm{
+    background: #00d084;
+}
+
+.addClientBtn span:hover{
+    background: #00d084;
+    box-shadow: 5px 5px 5px lightgreen;
+}
+
+.addClientBtn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+
+.title {
+    margin-bottom: 0.5em;
+    margin-top: 0.5em;
+    margin-left: 0.2em;
+    margin-right: 0.2em;
+
+    line-height: 1.15;
+    font-size: 1.5rem;
+  }
