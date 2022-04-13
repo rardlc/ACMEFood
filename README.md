@@ -6,17 +6,17 @@ This is the repository for the online platform for ACMEFood.com. The program is 
 -	Form inputs restrict (calendar meal choices only from those available on that day) and normalize inputs where possible (phone#s).
 -	Conflicts brought on by dietary restrictions are highlighted for staff resolution.
 
-I was trying to make it for anyone without a technical background to pick it up and use the program easily. I have been developing, deploying, and testing this application in a CentOS VM with 1 CPU core and 2gb of RAM for the server-side since that was most likely the environment it was going to run if it ever went online. I got it to a bug-free state so feel free to prove me wrong.
+I was trying to make it for anyone without a technical background to pick it up and use the program easily. I have been developing, deploying, and testing this application in a CentOS VM with 1 CPU core and 2gb of RAM for the server-side since that was most likely the environment it was going to run if it ever went online.
 
 ## Requirements and Installation
 -  [.NET ](https://dotnet.microsoft.com/en-us/download) \>= 5 (for the .docx formatting)
 - [NodeJS](https://nodejs.org/en/) \>= 12.x
--	MySQL Schema below
+-	[SQL Schema](https://github.com/rardlc/ACMEFood/blob/main/DB/createACMEFoodSchema.sql)
 
-![The App's SQL Schema screenshot from MySQL Workbench](https://github.com/rardlc/ACMEFood/blob/dev/ACMEfoodSchema.png?raw=true)
+![The App's SQL Schema screenshot from MySQL Workbench](https://github.com/rardlc/ACMEFood/blob/main/public/ACMEFoodSchema.png)
 
 
-Once you have the NodeJS and .NET framework installed and the mySQL ACMEFood database running in the background, execute from the root directory:
+Once you have NodeJS, the .NET framework installed and the mySQL ACMEFood database running in the background, execute from the root directory:
 
     npx next dev --port 3001
     node ./DB/dbServer.js
