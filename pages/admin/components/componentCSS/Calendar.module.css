@@ -15,30 +15,15 @@
 
 }
 
+.tformat {
+  border-collapse: collapse;
+  min-width: 70vw;
+  
+}
+
 .fullCell p{
   min-height: 30px;
   min-width: 30px;
 }
 
-
-.tformat > tr {
-  padding: inherit;
-  border-width: thin;
-  border-style:solid;
-  border-color: gray;
-}
-.tformat > th {
-  border-width: thin;
-  border-style:solid;
-  border-color: gray;
-
-}
-.tformat > td {
-  border-width: thin;
-  border-style:solid;
-  border-color: gray;
-  border-bottom: 0;
-  border-top: 0;
-
-}
 

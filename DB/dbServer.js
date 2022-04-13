@@ -18,10 +18,10 @@ const app = express()
 const bodyParser = require('body-parser');
 const sql = require("mysql2");
 var cors = require('cors')
-const moment = require('moment');  
+const moment = require('moment');
 const JSZip = require("jszip")
 const fs = require("fs").promises
-const {exec} = require('child_process')
+const { exec } = require('child_process')
 require('dotenv').config()
 
 
@@ -554,8 +554,8 @@ app.post('/export', (req, res) => {
 
   const csvDropoffPath = "/home/pat/ACMEFood/label-maker/portable/csv-in"
 
-  function writeOpenXML(err){
-    if(err){
+  function writeOpenXML(err) {
+    if (err) {
       console.log(err)
       throw err;
     }
@@ -585,12 +585,12 @@ app.post('/export', (req, res) => {
       const snack = await fs.open(csvDropoffPath + "/" + "Snack-FROM-" + startDate + "-TO-" + endDate + ".csv", "w+")
       await snack.writeFile(csvArr[4])
       await snack.close()
-      
+
       console.log("CSVs Written to", csvDropoffPath)
 
       exec("dotnet exec /home/pat/ACMEFood/label-maker/portable/openXMLParseNEdit.dll /home/pat/ACMEFood/label-maker/portable/csv-in /home/pat/ACMEFood/label-maker/portable/word-out",
         (err, stdout, stderr) => {
-          if(err){
+          if (err) {
             console.log(err)
             throw err;
           }
@@ -598,13 +598,13 @@ app.post('/export', (req, res) => {
             console.log("CONSOLE STDERROR: " + stderr)
           } else {
             stdout = stdout.replaceAll("/\\n/gi", "")
-            res.send(stdout.substring(0,stdout.length - 1))
+            res.send(stdout.substring(0, stdout.length - 1))
 
-            
+
           }
         }
       )
-      
+
 
       //run CSVs through
       // res.send(csvArr)
@@ -1494,7 +1494,6 @@ app.post('/setWeeklyMenus', (req, res) => {
 
       //transpose values of menu/calendars so rows are days and columns are meals of the day
       const weeklyMenu = diet["calendar"][0].map((_, colIndex) => diet["calendar"].map(row => row[colIndex]));
-
       pool.query(findMenuQ,
         (err, oldStoredMenu) => {
 
@@ -1572,44 +1571,22 @@ app.post('/setWeeklyMenus', (req, res) => {
                         (mealArr, day) => {
                           //we do 1 or more (depending on topLoopCount) SQL queries per day
                           let scheduleDay = thisWeek[day]
-                          //1for this client, find out the max loop count in each meal of this person
-                          let topLoopCount = 0
-                          let mealCountDict = {}
-                          console.log("WeeklyMeal:", client["WeeklyMeal"]) 
-                          const clientMealWeek = client["WeeklyMeal"].substring(day * 5, day * 5 + 5) //this client's meals for this week
-
-                          console.log(client)
-                          console.log(client["WeeklyMeal"])
-                          console.log(clientMealWeek)
-
-                          mealCountDict[0] = parseInt(clientMealWeek.charAt(0))
-                          mealCountDict[1] = parseInt(clientMealWeek.charAt(1))
-                          mealCountDict[2] = parseInt(clientMealWeek.charAt(2))
-                          mealCountDict[3] = parseInt(clientMealWeek.charAt(3))
-                          mealCountDict[4] = parseInt(clientMealWeek.charAt(4))
-
-                          for (var i = 0; i < clientMealWeek.length; i++) {
-                            const currentMealAmount = parseInt(clientMealWeek.charAt(i))
-
-                            if (currentMealAmount > topLoopCount) {
-                              topLoopCount = currentMealAmount
-                            }
-                          }
                           
-                          // make SQL queries for this day's meal as many times as this client's weeklyMeal says
-                          //we do 1 or more (depending on topLoopCount) SQL queries per day
-                          for (var i = 0; i < topLoopCount; i++) {
+                          console.log(`SELECT * FROM Schedule WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}'`)
+                          //checking whether this schedule for this client and day exists
+                          pool.query(`SELECT * FROM Schedule WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}'`, (err, currentScheduleDay) => {
+                            //do they have this date in their schedule, if so (UPDATE)
+                            if (currentScheduleDay.length > 0) {
 
-                            //each day will have a few records
-                            let sqlDishStrings = []
+                              let sqlDishStrings = []
 
-                            mealArr.forEach(
-                              //mealTime where 0 = breakfast, 1 = lunch, and so on
-                              (dish, mealTime) => {
+                              //check whether the restrictions of the client match the restrictions declared for this dish
+                              //mealArr where 0 = breakfast, 1 = lunch, and so on
+                              mealArr.forEach(
+                                (dish, mealTime) => {
 
-                                let dishString = dish["id"] ? dish["id"] : ""
+                                  let dishString = dish["id"] ? dish["id"] : ""
 
-                                //check whether the restrictions of the client match the restrictions declared for this dish
                                   clientRestAddrInfo.forEach((clientInfo) => {
                                     if (clientInfo["RestId"]) {
                                       if (dish.rest.find((restObj) => { if (restObj["RestId"] === clientInfo["RestId"]) return true; else return false })) {
@@ -1618,55 +1595,103 @@ app.post('/setWeeklyMenus', (req, res) => {
                                     }
                                   })
 
-
-                                //check whether this is the time this person said they wanted to eat, and whether they wanted to eat it this many times
-                                if (mealCountDict[mealTime] <= 0) {
-                                  dishString = ""
+                                  sqlDishStrings.push(dishString)
                                 }
+                              )
 
-                                mealCountDict[mealTime]--
+                              currentScheduleDay.forEach(
+                                (entryForDate, i) => {
+                                  //before updating this meal, check that the current value in the schedule is the same as the value in the menu, then change it, otherwise leave the schedule value
+                                  //the logic here is that we want to keep values that do not match the menus because they are custom values, put there by Patricia or a customer
+                                  sqlDishStrings[0] = (oldStoredMenu[day]["BFast01"] === currentScheduleDay[i]["BFast"] || currentScheduleDay[i]["BFast"] === "") ? sqlDishStrings[0] : currentScheduleDay[i]["BFast"]
+                                  sqlDishStrings[1] = (oldStoredMenu[day]["Lunch"] === currentScheduleDay[i]["Lunch"] || currentScheduleDay[i]["Lunch"] === "") ? sqlDishStrings[1] : currentScheduleDay[i]["Lunch"]
+                                  sqlDishStrings[2] = (oldStoredMenu[day]["Dinner"] === currentScheduleDay[i]["Dinner"] || currentScheduleDay[i]["Dinner"] === "") ? sqlDishStrings[2] : currentScheduleDay[i]["Dinner"]
+                                  sqlDishStrings[3] = (oldStoredMenu[day]["Extra1"] === currentScheduleDay[i]["Extra"] || currentScheduleDay[i]["Extra"] === "") ? sqlDishStrings[3] : currentScheduleDay[i]["Extra"]
+                                  sqlDishStrings[4] = (oldStoredMenu[day]["Snack"] === currentScheduleDay[i]["Snack"] || currentScheduleDay[i]["Snack"] === "") ? sqlDishStrings[4] : currentScheduleDay[i]["Snack"]
 
-                                sqlDishStrings.push(dishString)
+                                  let q = `UPDATE Schedule SET BFast='${sqlDishStrings[0]}', Lunch='${sqlDishStrings[1]}', Dinner='${sqlDishStrings[2]}', Extra='${sqlDishStrings[3]}', Snack='${sqlDishStrings[4]}'  
+                                          WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}' AND EntryId='${entryForDate["EntryId"]}'`
+                                  console.log(q)
+
+                                  pool.query(q)
+                                }
+                              )
+
+                            }
+
+                            //they do not have this date in their schedule (INSERT INTO)
+                            else {
+                              //for this client, find out the max loop count in each meal of this person
+                              let topLoopCount = 1
+                              let mealCountDict = {}
+                              // console.log("WeeklyMeal:", client["WeeklyMeal"]) 
+                              const clientMealWeek = client["WeeklyMeal"].substring(day * 5, day * 5 + 5) //this client's meals for this week
+
+                              // console.log(client)
+                              // console.log(client["WeeklyMeal"])
+                              // console.log(clientMealWeek)
+
+                              mealCountDict[0] = parseInt(clientMealWeek.charAt(0))
+                              mealCountDict[1] = parseInt(clientMealWeek.charAt(1))
+                              mealCountDict[2] = parseInt(clientMealWeek.charAt(2))
+                              mealCountDict[3] = parseInt(clientMealWeek.charAt(3))
+                              mealCountDict[4] = parseInt(clientMealWeek.charAt(4))
+
+                              for (var i = 0; i < clientMealWeek.length; i++) {
+                                const currentMealAmount = parseInt(clientMealWeek.charAt(i))
+
+                                if (currentMealAmount > topLoopCount) {
+                                  topLoopCount = currentMealAmount
+                                }
                               }
-                            )
+                              console.log(scheduleDay)
+                              console.log(topLoopCount)
+
+                              // make SQL queries for this day's meal as many times as this client's weeklyMeal says
+                              //we do 1 or more (depending on topLoopCount) SQL queries per day
+                              for (var i = 1; i <= topLoopCount; i++) {
+
+                                //each day will have a few records
+                                let sqlDishStrings = []
+
+                                //check whether the restrictions of the client match the restrictions declared for this dish
+                                mealArr.forEach(
+                                  //mealTime where 0 = breakfast, 1 = lunch, and so on
+                                  (dish, mealTime) => {
+
+                                    let dishString = dish["id"] ? dish["id"] : ""
+
+                                    clientRestAddrInfo.forEach((clientInfo) => {
+                                      if (clientInfo["RestId"]) {
+                                        if (dish.rest.find((restObj) => { if (restObj["RestId"] === clientInfo["RestId"]) return true; else return false })) {
+                                          dishString = ""
+                                        }
+                                      }
+                                    })
 
 
-                            //checking whether this schedule for this client and day exists
-                            pool.query(`SELECT * FROM Schedule WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}'`, (err, currentScheduleDay) => {
-                              console.log(`SELECT * FROM Schedule WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}'`)
-                              //do they have this datew in their schedule, if so (UPDATE)
-                              if (currentScheduleDay.length > 0) {
+                                    //check whether this is the time this person said they wanted to eat, and whether they wanted to eat it this many times
+                                    if (mealCountDict[mealTime] <= 0) {
+                                      dishString = ""
+                                    }
 
-                                // console.log(currentScheduleDay)
-                                // console.log(sqlDishStrings)
+                                    mealCountDict[mealTime]--
 
-                                //before updating this meal, check that the current value in the schedule is the same as the value in the menu, then change it, otherwise leave the schedule value
-                                //the logic here is that we want to keep values that do not match the menus because they are custom values, put there by Patricia or a customer
-                                sqlDishStrings[0] = (oldStoredMenu[day]["BFast01"] === currentScheduleDay[0]["BFast"] || currentScheduleDay[0]["BFast"] === "") ? sqlDishStrings[0] : currentScheduleDay[0]["BFast"]
-                                sqlDishStrings[1] = (oldStoredMenu[day]["Lunch"] === currentScheduleDay[0]["Lunch"] || currentScheduleDay[0]["Lunch"] === "") ? sqlDishStrings[1] : currentScheduleDay[0]["Lunch"]
-                                sqlDishStrings[2] = (oldStoredMenu[day]["Dinner"] === currentScheduleDay[0]["Dinner"] || currentScheduleDay[0]["Dinner"] === "") ? sqlDishStrings[2] : currentScheduleDay[0]["Dinner"]
-                                sqlDishStrings[3] = (oldStoredMenu[day]["Extra1"] === currentScheduleDay[0]["Extra"] || currentScheduleDay[0]["Extra"] === "") ? sqlDishStrings[3] : currentScheduleDay[0]["Extra"]
-                                sqlDishStrings[4] = (oldStoredMenu[day]["Snack"] === currentScheduleDay[0]["Snack"] || currentScheduleDay[0]["Snack"] === "") ? sqlDishStrings[4] : currentScheduleDay[0]["Snack"]
+                                    sqlDishStrings.push(dishString)
+                                  }
+                                )
 
-                                let q = `UPDATE Schedule SET BFast='${sqlDishStrings[0]}', Lunch='${sqlDishStrings[1]}', Dinner='${sqlDishStrings[2]}', Extra='${sqlDishStrings[3]}', Snack='${sqlDishStrings[4]}'  
-                              WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}'`
-                                console.log(q)
-
-                                pool.query(q)
-                              }
-                              //they do not have this date in their schedule (INSERT INTO)
-                              else {
                                 let q = `INSERT INTO Schedule (Date, ClientId, BFast, Lunch, Dinner, Extra, Snack, AddrId) VALUES 
-                              ('${scheduleDay}', '${client.ClientId}', '${sqlDishStrings[0]}','${sqlDishStrings[1]}','${sqlDishStrings[2]}','${sqlDishStrings[3]}','${sqlDishStrings[4]}', '${clientRestAddrInfo[0]["AddrId"]}')`
-                                console.log(q)
-                                pool.query(q)
-                              }
-
-                            })
-
-                          } // end of "for this day, write some sql queries"
-
-
+                                ('${scheduleDay}', '${client.ClientId}', '${sqlDishStrings[0]}','${sqlDishStrings[1]}','${sqlDishStrings[2]}','${sqlDishStrings[3]}','${sqlDishStrings[4]}', '${clientRestAddrInfo[0]["AddrId"]}')`
+                                  console.log(q)
+                                  pool.query(q)
+                                }
+                              } // end of "for this day, write some sql queries"
+                          })
+                          //check whether the records for this day exist, if they do exist:
+                          // - UPDATE each record that appeared
+                          //if they do not exist:
+                          // insert as many as the for-loop below 
                         }
                       )
 
@@ -2713,6 +2738,7 @@ app.post('/getClientSchedule', (req, res) => {
   Date\
   ,ClientId\
   ,BFast\
+  ,EntryId
 , (SELECT DishDescription FROM ACMEFood.Dish\
     WHERE S.BFast = DishId) as BFastDesc\
   ,Lunch\

@@ -122,9 +122,7 @@ input[type="password"]:hover{
 
 }
 
-table {
-  border-collapse:collapse;
-}
+
 
 .ant-select:hover, .ant-select-auto-complete:hover, .ant-select-single:hover, .ant-select-show-search:hover {
   border-color: #00d084 !important;

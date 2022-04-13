@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import {AutoComplete, DatePicker, Select} from "antd";
+import { AutoComplete, DatePicker, Select } from "antd";
 import axios from "axios"
 import styles from "./componentCSS/Calendar.module.css"
 
-const {Option} = Select;
+const { Option } = Select;
 
 const backendIP = "../../api"
 
 const Calendar = props => {
 
-    
-    const [dishes, setDishes] = useState([]) 
+
+    const [dishes, setDishes] = useState([])
 
     const [active, setActive] = useState()
     const [render, setRender] = useState(false)
@@ -22,53 +22,69 @@ const Calendar = props => {
 
 
     const [restTypes, setRestTypes] = useState(null)
-    const [dishTypes, setDishTypes] = useState([[],[],[],[],[],[],[]])
+    const [dishTypes, setDishTypes] = useState([[], [], [], [], [], [], []])
 
-    useEffect( () => {
+    useEffect(() => {
         console.log("I loaded right now.")
-    },[])
-    
+    }, [])
+
     function datePicked(date, dateString) {
         //console.log(props)
 
         setDatePick(date)
 
-        if(date){
-            if(props.clientId){
+        if (date) {
+            if (props.clientId) {
                 var postConfig = {
                     method: "post",
                     url: `../../api/getClientSchedule`,
                     data: {
-                        date : date,
+                        date: date,
                         clientId: props.clientId
                     }
                 }
                 axios(postConfig).then(
                     res => {
-                        console.log(res.data)
+                        // console.log(res.data)
 
-                        if(res.data.length !== 0){
-                            setDishes(res.data)
+                        if (res.data.length !== 0) {
+
+                            let cal = []
+                            // console.log(res.data)
+                            res.data.forEach(
+                                (schRow, i) => {
+                                    let alreadyAdded = false
+
+                                    if (i > 0) {
+                                        cal.forEach(
+                                            (existingEntry, index) => {
+                                                if (existingEntry[0].Date === schRow.Date) {
+                                                    cal[index].push(schRow)
+                                                    alreadyAdded = true
+                                                }
+                                            }
+                                        )
+                                    }
+
+                                    if (!alreadyAdded) {
+                                        cal.push([schRow])
+                                    }
+
+                                }
+                            )
+
+                            // console.log(cal)
+
+                            setDishes(cal)
+
                         } else {
-                            setDishes([{"key":"Lunes","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "", "AddrId":""},
-                            {"key":"Martes","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                            {"key":"Miercole","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                            {"key":"Jueves","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                            {"key":"Viernes","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                            {"key":"Sabado","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                            {"key":"Domingo","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""}])
+                            setDishes([])
                         }
                         //console.log(dishes)
                     }
                 )
             } else {
-                setDishes([{"key":"Lunes","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                {"key":"Martes","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                {"key":"Miercole","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                {"key":"Jueves","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                {"key":"Viernes","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                {"key":"Sabado","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""},
-                {"key":"Domingo","BFast": "","Lunch": "","Dinner": "","Extra": "","Snack": "","AddrId":""}])
+                setDishes([])
             }
             props.sendDate(date)
 
@@ -85,15 +101,15 @@ const Calendar = props => {
                 });
                 setRestTypes(types)
             })
- 
+
     }
 
-    function getAddrTypes(){
+    function getAddrTypes() {
         var types = {}
-        if (props.addrs){
+        if (props.addrs) {
             //console.log(props.addrs)
             props.addrs.forEach(e => {
-                types[e.AddrId] = {value: e.AddrId, label: e.StreetNo + " " + e.StreetName + " " + e.Apt + " " + e.ZipCode + " " + e.City}
+                types[e.AddrId] = { value: e.AddrId, label: e.StreetNo + " " + e.StreetName + " " + e.Apt + " " + e.ZipCode + " " + e.City }
             });
             setaddrTypes(types)
         }
@@ -104,19 +120,19 @@ const Calendar = props => {
         var postConfig = {
             method: "post",
             url: `../../api/getEachDaysDishes`,
-            data: {date: datePick}
+            data: { date: datePick }
         }
 
         return axios(postConfig).then(
             (res) => {
-                if(res.data){
+                if (res.data) {
                     setDishTypes(res.data)
                 }
             })
     }
 
     useEffect(() => {
-        datePicked(datePick,null)
+        datePicked(datePick, null)
         //get autocomplete options
         getRestTypes()
         getAddrTypes()
@@ -129,34 +145,32 @@ const Calendar = props => {
 
     }, [props.addrs])
 
-    useEffect( () => {
+    useEffect(() => {
         props.formCallback(dishes)
-        console.log(dishes)
+        // console.log(dishes)
         //console.log(addrTypes)
     }, [dishes, active, render])
 
-    useEffect( ()=> {
+    useEffect(() => {
         //console.log(datePick)
         getDishTypes()
-    },[datePick])
+    }, [datePick])
 
-    function onSelect(e,dishLoc){
-        console.log(e)
-
-        
+    function onSelect(e) {
+        // console.log(e)
         setValidInput(true)
     }
 
-    function onSearchDish(searchText, dishSrc, dishLoc){
+    function onSearchDish(searchText, dishSrc, dishLoc) {
         var matches = []
         for (const [id, desc] of Object.entries(dishSrc)) {
-            if(desc["DishDescription"]){
+            if (desc["DishDescription"]) {
                 var str = desc["DishDescription"].toLowerCase();
-                console.log(str)
-                console.log(searchText.toLowerCase())
+                // console.log(str)
+                // console.log(searchText.toLowerCase())
                 var start = str.search(searchText.toLowerCase());
-                console.log(start)
-                if(start !== -1){
+                // console.log(start)
+                if (start !== -1) {
                     matches.push(dishSrc[id])
                 }
             }
@@ -168,14 +182,14 @@ const Calendar = props => {
         //     matches.push(dish)
         //   }
         // })
-        console.log(searchResult(searchText, matches))
+        // console.log(searchResult(searchText, matches))
         setDishOptions(searchText ? searchResult(searchText, matches, dishLoc) : []);
     }
 
-    function searchResult(searchTerm, matches, dishLoc){
+    function searchResult(searchTerm, matches, dishLoc) {
         return matches.map(
             (match, idx) => {
-                console.log(match)
+                // console.log(match)
                 return {
                     key: match["DishId"],
                     value: match["DishDescription"],
@@ -187,15 +201,18 @@ const Calendar = props => {
                             }}
                             onClick={() => {
                                 let dayI = dishLoc[0]
-                                let meal = dishLoc[1]
+                                let mealI = dishLoc[1]
+                                let mealName = dishLoc[2]
 
-                                console.log(dishLoc)
+                                // console.log(dishLoc)
 
-                                dishes[dayI][meal] = match["DishId"]
-                                dishes[dayI][meal + "Desc"] = match["DishDescription"]
+                                dishes[dayI][mealI][mealName] = match["DishId"]
+                                dishes[dayI][mealI][mealName + "Desc"] = match["DishDescription"]
 
                                 setDishOptions(null)
                                 setDishes([...dishes])
+                                setValidInput(true)
+                                console.log(dishes)
 
                             }}
                         >
@@ -211,13 +228,13 @@ const Calendar = props => {
         )
     }
 
-    function onSearchAddress(searchText){
+    function onSearchAddress(searchText) {
         //console.log(searchText)
         var matches = []
         for (const [id, desc] of Object.entries(addrTypes)) {
             var str = desc["label"].toLowerCase();
             var start = str.search(searchText.toLowerCase());
-            if(start !== -1){
+            if (start !== -1) {
                 matches.push(addrTypes[id])
             }
         }
@@ -233,229 +250,137 @@ const Calendar = props => {
 
     useEffect(() => {
         // console.log(dishOptions)
-        }
-    ,[dishOptions])
+    }
+        , [dishOptions])
 
+    const mealHeaders = ["BFast", "Lunch", "Dinner", "Extra", "Snack"]
+    const dayHeaders = ["Domingo", "Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"]
+    return (
+        <div>
+            <DatePicker onChange={datePicked} picker="week" />
+            {dishes[0] && datePick !== null ?
+                <table className={styles.tformat}>
+                    <thead>
+                        <th className={styles.fullCell}></th>
+                        <th className={styles.fullCell}>Domingo</th>
+                        <th className={styles.fullCell}>Lunes</th>
+                        <th className={styles.fullCell}>Martes</th>
+                        <th className={styles.fullCell}>Miercole</th>
+                        <th className={styles.fullCell}>Jueves</th>
+                        <th className={styles.fullCell}>Viernes</th>
+                        <th className={styles.fullCell}>Sabado</th>
+                    </thead>
+                    <tbody>
+                        {
+                            mealHeaders.map((mealHeader, mealIndex) => {
+                                return (
+                                    <tr>
+                                        <th className={styles.fullCell}>{mealHeader == "BFast" ? "Breakfast" : mealHeader}</th>
+                                        {
+                                            dishes.length > 0 ? dishes.map((day, dayI) => {
 
-    return(
-    <div>
-        <DatePicker onChange={datePicked} picker="week" />
-        {dishes[0] && datePick !== null ? 
-        <table>
-            <thead>
-                <th className={styles.fullCell}></th>
-                <th className={styles.fullCell}>Domingo</th>
-                <th className={styles.fullCell}>Lunes</th>
-                <th className={styles.fullCell}>Martes</th>
-                <th className={styles.fullCell}>Miercole</th>
-                <th className={styles.fullCell}>Jueves</th>
-                <th className={styles.fullCell}>Viernes</th>
-                <th className={styles.fullCell}>Sabado</th>
-            </thead>
-            <tbody>
-                <tr> 
-                    <th className={styles.fullCell}>Desayuno</th>
-                    {dishes.map((day, dayI) =>{
+                                                let mealsExpected = parseInt(props.currWeeklyMeals[(dayI * 5) + mealIndex])
+                                                let dataAvailable = day.filter(
+                                                    (entry) => {
+                                                        if( entry[mealHeader + "Desc"] ){
+                                                            return entry;
+                                                        }
+                                                    }
+                                                )
+                                                return (
+                                                    <td className={day[mealHeader + "Desc"] === "" ? styles.emptyCell : styles.fullCell}
+                                                        onBlur={() => setActive()}>
+                                                        {
+                                                            new Array( parseInt(props.currWeeklyMeals[(dayI * 5) + mealIndex]) ).fill(0).map(
+                                                                (_, mealI) => {
 
-                        return(
-                        active === dayI + "^" + "BFast" ? 
-                        <td className={ day["BFastDesc"] === "" && props.currWeeklyMeals[(dayI * 5) + 0] === "1" ? styles.emptyCell: styles.fullCell}><AutoComplete
-                               allowClear={true}
-                               defaultValue={day["BFastDesc"]} 
-                               options={dishOptions}
-                               onBlur={(e) => {
-                                    if(validInput){
-                                        console.log(e.target)
-                                        setValidInput(false)
-                                        // dishes[dayI]["BFast"] = e.target.value;
-                                        // dishes[dayI]["BFastDesc"] = dishTypes[e.target.value]["label"]
-                                        // setDishes(dishes);                                         
-                                    }
-                                    setActive()
-                                }}
-                               onClear={() => {setValidInput(false);dishes[dayI]["BFast"] = ""; dishes[dayI]["BFastDesc"] = ""; setDishes(dishes)}}
-                               style={{
-                                   width: 200,
-                                   padding: 0,
-                                   margin: 0
-                               }}
-                               onSelect={(e) => {onSelect(e,[dayI,"BFast"])}}
-                               onSearch={(searchTerm) => {onSearchDish(searchTerm, dishTypes[dayI], [dayI,"BFast"])}}
-                               placeholder="Meal not found; Type to find"
-                               /></td>
-                        :<td className={ !day["BFastDesc"] && props.currWeeklyMeals[(dayI * 5) + 0] === "1"? styles.emptyCell: styles.fullCell} id={dayI + "^" + "BFast"} onClick={(e)=>{setActive(e.target.id)}}>{day["BFastDesc"]}</td>
-                        )
-                    })}
-                    
-                </tr>
-                <tr> 
-                    <th className={styles.fullCell}>Almuerzo</th>
-                    {dishes.map((day, dayI) =>{
+                                                                        if (mealsExpected > 0) {
 
-                        return(
-                        active === dayI + "^" + "LunchDesc" ? 
-                        <td className={ day["LunchDesc"] === "" ? styles.emptyCell: styles.fullCell}><AutoComplete
-                        allowClear={true}
+                                                                            mealsExpected--;
+                                                                            return (
+                                                                                active === dayI + "^" + mealI + "^" + mealHeader + "Desc" ?
+                                                                                    <div>
+                                                                                        <AutoComplete
+                                                                                            allowClear={true}
+                                                                                            defaultValue={dataAvailable[mealI] ? dataAvailable[mealI][mealHeader + "Desc"] : ""}
+                                                                                            options={dishOptions}
+                                                                                            onBlur={(e) => {
+                                                                                                if (validInput) {
+                                                                                                    console.log(e.target)
+                                                                                                    setValidInput(false)
+                                                                                                    // dishes[dayI][mealI][mealHeader] = e.target.value;
+                                                                                                    // dishes[dayI][mealI][mealHeader + "Desc"] = dishTypes[e.target.value]["label"]
+                                                                                                    // setDishes(dishes);                                          
+                                                                                                }
+                                                                                            }}
 
-                        defaultValue={day["LunchDesc"]} 
-                        options={dishOptions}
-                        onBlur={(e) => {
-                             if(validInput){
-                                console.log(e.target)
-                                setValidInput(false)
-                                // dishes[dayI]["Lunch"] = e.target.value;
-                                // dishes[dayI]["LunchDesc"] = dishTypes[e.target.value]["label"]
-                                // setDishes(dishes);                                      
-                             }
-                             setActive()
-                         }}
-                        style={{
-                            width: 200,
-                            padding: 0
-                        }}
-                        onSelect={onSelect}
-                        onSearch={(searchTerm) => {onSearchDish(searchTerm, dishTypes[dayI], [dayI,"Lunch"])}}
-                        onClear={() => {setValidInput(false);dishes[dayI]["Lunch"] = ""; dishes[dayI]["LunchDesc"] = ""; setDishes(dishes)}}
-                        placeholder="Meal not found; Type to find"
-                        /></td>
-                        :<td className={ !day["LunchDesc"] && props.currWeeklyMeals[(dayI * 5) + 1] === "1"? styles.emptyCell: styles.fullCell} id={dayI + "^" + "LunchDesc"} onClick={(e)=>{setActive(e.target.id)}}>{day["LunchDesc"]}</td>
-                        )
-                    })}
-                </tr>
-                <tr> 
-                    <th className={styles.fullCell}>Cena</th>
-                    {dishes.map((day, dayI) =>{
+                                                                                            style={{
+                                                                                                width: 200,
+                                                                                                padding: 0
+                                                                                            }}
+                                                                                            onSelect={onSelect}
+                                                                                            onSearch={(searchTerm) => { onSearchDish(searchTerm, dishTypes[dayI], [dayI, mealI,mealHeader]) }}
+                                                                                            placeholder="Meal not found; Type to find"
+                                                                                            onClear={() => {dishes[dayI][mealI][mealHeader] = ""; dishes[dayI][mealI][mealHeader + "Desc"] = ""; setDishes([...dishes]); setValidInput(false); }}
+                                                                                        />
+                                                                                    </div>
+                                                                                    : <div
+                                                                                        className={ dataAvailable[mealI] && dataAvailable[mealI][mealHeader + "Desc"] && parseInt(props.currWeeklyMeals[(dayI * 5) + mealIndex]) > 0 ? styles.fullCell : styles.emptyCell}
+                                                                                        id={dayI + "^" + mealI + "^" + mealHeader + "Desc"}
+                                                                                        onClick={(e) => { setActive(e.target.id) }}>
+                                                                                        {dataAvailable[mealI] ? dataAvailable[mealI][mealHeader + "Desc"] : ""}
+                                                                                        
+                                                                                    </div>
+                                                                            )
+                                                                        }
+                                                                }
+                                                            )
+                                                        }
+                                                    </td>
+                                                )
+                                            }) : null
+                                        }
+                                    </tr>
+                                )
+                            })
+                        }
 
-                        return(
-                        active === dayI + "^" + "DinnerDesc" ?                         
-                        <td className={ day["DinnerDesc"] === "" && active !== dayI + "^" + "DinnerDesc" ? styles.emptyCell: styles.fullCell}><AutoComplete
-                        allowClear={true}
-                        defaultValue={day["DinnerDesc"]} 
-                        options={dishOptions}
-                        onBlur={(e) => {
-                             if(validInput){
-                                console.log(e.target)
-                                setValidInput(false)
-                                // dishes[dayI]["Dinner"] = e.target.value;
-                                // dishes[dayI]["DinnerDesc"] = dishTypes[e.target.value]["label"]
-                                // setDishes(dishes);                                     
-                             }
-                             setActive()
-                         }}
-                        style={{
-                            width: 200,
-                            padding: 0
-                        }}
-                        onSelect={onSelect}
-                        onSearch={(searchTerm) => {onSearchDish(searchTerm, dishTypes[dayI], [dayI,"Dinner"])}}
-                        onClear={() => {setValidInput(false);dishes[dayI]["Dinner"] = ""; dishes[dayI]["DinnerDesc"] = ""; setDishes(dishes)}}
-                        placeholder="Meal not found; Type to find"
-                        /></td>
-                        :<td className={ !day["DinnerDesc"] && props.currWeeklyMeals[(dayI * 5) + 2] === "1"? styles.emptyCell: styles.fullCell} id={dayI + "^" + "DinnerDesc"} onClick={(e)=>{setActive(e.target.id)}}>{day["DinnerDesc"]}</td>
-                        )
-                    })}
-                </tr>
-                <tr> 
-                    <th className={styles.fullCell}>Extra</th>
-                    {dishes.map((day, dayI) =>{
+                        <tr>
+                            <th className={styles.fullCell}>Direccion</th>
+                            {dishes.map((day, dayI) => {
 
-                        return(
-                        active === dayI + "^" + "ExtraDesc" ?                         
-                        <td className={ day["ExtraDesc"] === "" ? styles.emptyCell: styles.fullCell} ><AutoComplete
-                        allowClear={true}
-
-                        defaultValue={day["ExtraDesc"]} 
-                        options={dishOptions}
-                        onBlur={(e) => {
-                             if(validInput){
-                                console.log(e.target)
-                                setValidInput(false)
-                                // dishes[dayI]["Extra"] = e.target.value;
-                                // dishes[dayI]["ExtraDesc"] = dishTypes[e.target.value]["label"]
-                                // setDishes(dishes);                                    
-                             }
-                             setActive()
-                         }}
-                        style={{
-                            width: 200,
-                            padding: 0
-                        }}
-                        onSelect={onSelect}
-                        onClear={() => {setValidInput(false);dishes[dayI]["Extra"] = ""; dishes[dayI]["ExtraDesc"] = ""; setDishes(dishes)}}
-                        onSearch={(searchTerm) => {onSearchDish(searchTerm, dishTypes[dayI], [dayI,"Extra"])}}
-                        placeholder="Meal not found; Type to find"
-                        /></td>
-                        :<td className={ !day["ExtraDesc"] && props.currWeeklyMeals[(dayI * 5) + 3] === "1"? styles.emptyCell: styles.fullCell} id={dayI + "^" + "ExtraDesc"} onClick={(e)=>{setActive(e.target.id)}}>{day["ExtraDesc"]}</td>
-                        )
-                    })}
-                </tr>
-                <tr> 
-                    <th className={styles.fullCell}>Snack</th>
-                    {dishes.map((day, dayI) =>{
-                        return(
-                        active === dayI + "^" + "SnackDesc" ?                         
-                        <td><AutoComplete
-                        allowClear={true}
-                        defaultValue={day["SnackDesc"]}
-                        options={dishOptions}
-                        onBlur={(e) => {
-                             if(validInput){
-                                console.log(e.target)
-                                setValidInput(false)
-                                // dishes[dayI]["Snack"] = e.target.value;
-                                // dishes[dayI]["SnackDesc"] = dishTypes[e.target.value]["label"]
-                                // setDishes(dishes);                                          
-                             }
-                             setActive()
-                         }}
-                        style={{
-                            width: 200,
-                            padding: 0
-                        }}
-                        onSelect={onSelect}
-                        onSearch={(searchTerm) => {onSearchDish(searchTerm, dishTypes[dayI], [dayI,"Snack"])}}
-                        placeholder="Meal not found; Type to find"
-                        onClear={() => {setValidInput(false);dishes[dayI]["Snack"] = ""; dishes[dayI]["SnackDesc"] = ""; setDishes(dishes)}}
-                        /></td>
-                        :<td className={ !day["SnackDesc"] && props.currWeeklyMeals[(dayI * 5) + 4] === "1"? styles.emptyCell: styles.fullCell} id={dayI + "^" + "SnackDesc"} onClick={(e)=>{setActive(e.target.id)}}>{day["SnackDesc"]}</td>
-                        )
-                    })}
-                </tr>
-                <tr> 
-                    <th className={styles.fullCell}>Direccion</th>
-                    {dishes.map((day, dayI) =>{
-
-                        return(
-                        active === dayI + "^" + "AddrId" ?                         
-                        <td><AutoComplete
-                        allowClear={true}
-                        defaultValue={day["Addr"]} 
-                        options={addrOptions}
-                        onBlur={(e) => {
-                             if(validInput){
-                                console.log(e.target)
-                                setValidInput(false)
-                                dishes[dayI]["AddrId"] = e.target.value;
-                                dishes[dayI]["Addr"] = addrTypes[e.target.value]["label"]
-                                setDishes(dishes);                            
-                             }
-                             setActive()
-                         }}
-                        style={{
-                            width: 200,
-                            padding: 0
-                        }}
-                        onSelect={onSelect}
-                        onSearch={onSearchAddress}
-                        onClear={() => {setValidInput(false);dishes[dayI]["Addr"] = ""; dishes[dayI]["AddrDesc"] = ""; setDishes(dishes)}}
-                        placeholder="Address not found; Type to find"
-                        /></td>
-                        :<td className={ !day["Addr"] && props.currWeeklyMeals[(dayI * 5) + 1] === "1"? styles.emptyCell: styles.fullCell} id={dayI + "^" + "AddrId"} onClick={(e)=>{setActive(e.target.id)}}>{day["Addr"]}</td>
-                        )
-                    })}
-                </tr>
-            </tbody>
-        </table>
-        :null}
-    </div>)}
+                                return (
+                                    active === dayI + "^" + "AddrId" ?
+                                        <td><AutoComplete
+                                            allowClear={true}
+                                            defaultValue={day["Addr"]}
+                                            options={addrOptions}
+                                            onBlur={(e) => {
+                                                if (validInput) {
+                                                    console.log(e.target)
+                                                    setValidInput(false)
+                                                    dishes[dayI]["AddrId"] = e.target.value;
+                                                    dishes[dayI]["Addr"] = addrTypes[e.target.value]["label"]
+                                                    setDishes(dishes);
+                                                }
+                                                setActive()
+                                            }}
+                                            style={{
+                                                width: 200,
+                                                padding: 0
+                                            }}
+                                            onSelect={onSelect}
+                                            onSearch={onSearchAddress}
+                                            onClear={() => { setValidInput(false); dishes[dayI]["Addr"] = ""; dishes[dayI]["AddrDesc"] = ""; setDishes(dishes) }}
+                                            placeholder="Address not found; Type to find"
+                                        /></td>
+                                        : <td className={!day["Addr"] && props.currWeeklyMeals[(dayI * 5) + 1] === "1" ? styles.emptyCell : styles.fullCell} id={dayI + "^" + "AddrId"} onClick={(e) => { setActive(e.target.id) }}>{day["Addr"]}</td>
+                                )
+                            })}
+                        </tr>
+                    </tbody>
+                </table>
+                : null}
+        </div>)
+}
 export default Calendar;
