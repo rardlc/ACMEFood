@@ -24,7 +24,6 @@ const fs = require("fs").promises
 const { exec } = require('child_process')
 require('dotenv').config()
 
-
 const knex = require('knex')({
   client: 'mysql2',
   connection: {
@@ -1875,7 +1874,7 @@ app.post('/setClientChanges', (req, res) => {
   var calDate = req.body.calDate
   var diet = req.body.basic.diet
 
-  console.log(req.body)
+  console.log(req.body.cal)
   var weeklyMeals = clientInfo["weekly"]
 
   var monday = new Date(getThisMonday(calDate));
@@ -2108,29 +2107,35 @@ app.post('/setClientChanges', (req, res) => {
         //setting Schedule to changes in Calendar.js
         (col, dayI) => {
 
-          if (weeklyMeals[(dayI * 5) + 0] === "0") {
-            col["BFast"] = ""
-          }
-          if (weeklyMeals[(dayI * 5) + 1] === "0") {
-            col["Lunch"] = ""
-          }
-          if (weeklyMeals[(dayI * 5) + 2] === "0") {
-            col["Dinner"] = ""
-          }
-          if (weeklyMeals[(dayI * 5) + 3] === "0") {
-            col["Extra"] = ""
-          }
-          if (weeklyMeals[(dayI * 5) + 4] === "0") {
-            col["Snack"] = ""
-          }
-          console.log(col["Date"])
-          console.log("---------------------")
-          console.log(week[dayI])
-          if (col["Date"]) {
-            pool.execute("UPDATE Schedule SET BFast=?, Lunch=?, Dinner=?, Extra=?, Snack=?, AddrId=? WHERE ClientId=? AND Date=?", [col["BFast"], col["Lunch"], col["Dinner"], col["Extra"], col["Snack"], col["AddrId"] === "" ? -1 : col["AddrId"], clientId, dateFormatSQL(col["Date"])], (err, v) => { if (err) console.log(err) })
-          } else {
-            pool.execute("INSERT INTO Schedule (ClientId,Bfast,Lunch,Dinner,Extra,Snack,AddrId,Date) VALUES (?,?,?,?,?,?,?,?)", [clientId, col["BFast"], col["Lunch"], col["Dinner"], col["Extra"], col["Snack"], col["AddrId"] === "" ? -1 : col["AddrId"], week[dayI]], (err) => { if (err) console.log(err) })
-          }
+
+          console.log(col[0]["Date"])
+          console.log("--------------------")
+          col.forEach(
+            (mealInDay) => {
+              if (weeklyMeals[(dayI * 5) + 0] === "0") {
+                mealInDay["BFast"] = ""
+              }
+              if (weeklyMeals[(dayI * 5) + 1] === "0") {
+                mealInDay["Lunch"] = ""
+              }
+              if (weeklyMeals[(dayI * 5) + 2] === "0") {
+                mealInDay["Dinner"] = ""
+              }
+              if (weeklyMeals[(dayI * 5) + 3] === "0") {
+                mealInDay["Extra"] = ""
+              }
+              if (weeklyMeals[(dayI * 5) + 4] === "0") {
+                mealInDay["Snack"] = ""
+              }
+              console.log(mealInDay)
+              if (mealInDay["EntryId"] > 0){
+                pool.execute("UPDATE Schedule SET BFast=?, Lunch=?, Dinner=?, Extra=?, Snack=?, AddrId=? WHERE ClientId=? AND Date=? AND EntryId=?", [mealInDay["BFast"], mealInDay["Lunch"], mealInDay["Dinner"], mealInDay["Extra"], mealInDay["Snack"], mealInDay["AddrId"] === "" ? -1 : mealInDay["AddrId"], clientId, dateFormatSQL( new Date(mealInDay["Date"]) ), mealInDay["EntryId"]], (err, v) => { if (err) console.log(err) })
+              } else {
+                pool.execute("INSERT INTO Schedule (ClientId,Bfast,Lunch,Dinner,Extra,Snack,AddrId,Date) VALUES (?,?,?,?,?,?,?,?)", [clientId, mealInDay["BFast"], mealInDay["Lunch"], mealInDay["Dinner"], mealInDay["Extra"], mealInDay["Snack"], mealInDay["AddrId"] === "" ? -1 : mealInDay["AddrId"], week[dayI]], (err) => { if (err) console.log(err) })
+              }
+
+            }
+          )
         }
       )
     })

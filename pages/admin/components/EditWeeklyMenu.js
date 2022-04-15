@@ -1,6 +1,5 @@
 import styles from "./componentCSS/EditWeeklyMenu.module.css"
 import { useEffect, useState } from "react"
-import {InputNumber} from "antd";
 
 function EditWeeklyMenu({weeklyMenu, setWeeklyMenu}){
 
@@ -11,7 +10,7 @@ function EditWeeklyMenu({weeklyMenu, setWeeklyMenu}){
         if(weeklyMenu){
             setWeeklyMeals(weeklyMenu)
         }
-    },[weeklyMenu])
+    },[weeklyMenu, setWeeklyMenu, weeklyMeals])
 
     useEffect( () => {
         if(!weeklyMenu){

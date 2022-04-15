@@ -186,10 +186,8 @@ function ClientForm({ formName, ClientId, addFormToParent, accountId }) {
 
     //if new client
     if (clientId === "" || clientId <= 0) {
-      const accountSearchParam = "clid"
       //new client
       var currentForm = form.getFieldsValue();
-      console.log(currentForm["diet"])
       var basic = {
         fname: currentForm["fname"],
         lname: currentForm["lname"],

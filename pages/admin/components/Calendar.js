@@ -147,7 +147,7 @@ const Calendar = props => {
 
     useEffect(() => {
         props.formCallback(dishes)
-        // console.log(dishes)
+        console.log(dishes)
         //console.log(addrTypes)
     }, [dishes, active, render])
 
@@ -201,13 +201,11 @@ const Calendar = props => {
                             }}
                             onClick={() => {
                                 let dayI = dishLoc[0]
-                                let mealI = dishLoc[1]
-                                let mealName = dishLoc[2]
+                                let dishesLoc = dishLoc[2]
+                                let mealName = dishLoc[3]
 
-                                // console.log(dishLoc)
-
-                                dishes[dayI][mealI][mealName] = match["DishId"]
-                                dishes[dayI][mealI][mealName + "Desc"] = match["DishDescription"]
+                                dishes[dayI][dishesLoc][mealName] = match["DishId"]
+                                dishes[dayI][dishesLoc][mealName + "Desc"] = match["DishDescription"]
 
                                 setDishOptions(null)
                                 setDishes([...dishes])
@@ -281,8 +279,10 @@ const Calendar = props => {
 
                                                 let mealsExpected = parseInt(props.currWeeklyMeals[(dayI * 5) + mealIndex])
                                                 let dataAvailable = day.filter(
-                                                    (entry) => {
-                                                        if( entry[mealHeader + "Desc"] ){
+                                                    (entry, index) => {
+                                                        entry["dishesLoc"] = index;
+
+                                                        if( entry[mealHeader + "Desc"] !== null ){
                                                             return entry;
                                                         }
                                                     }
@@ -301,6 +301,7 @@ const Calendar = props => {
                                                                                 active === dayI + "^" + mealI + "^" + mealHeader + "Desc" ?
                                                                                     <div>
                                                                                         <AutoComplete
+                                                                                            key={dayI + "^" + mealI + "^" + mealHeader + "Desc"}
                                                                                             allowClear={true}
                                                                                             defaultValue={dataAvailable[mealI] ? dataAvailable[mealI][mealHeader + "Desc"] : ""}
                                                                                             options={dishOptions}
@@ -308,9 +309,6 @@ const Calendar = props => {
                                                                                                 if (validInput) {
                                                                                                     console.log(e.target)
                                                                                                     setValidInput(false)
-                                                                                                    // dishes[dayI][mealI][mealHeader] = e.target.value;
-                                                                                                    // dishes[dayI][mealI][mealHeader + "Desc"] = dishTypes[e.target.value]["label"]
-                                                                                                    // setDishes(dishes);                                          
                                                                                                 }
                                                                                             }}
 
@@ -319,12 +317,13 @@ const Calendar = props => {
                                                                                                 padding: 0
                                                                                             }}
                                                                                             onSelect={onSelect}
-                                                                                            onSearch={(searchTerm) => { onSearchDish(searchTerm, dishTypes[dayI], [dayI, mealI,mealHeader]) }}
+                                                                                            onSearch={(searchTerm) => { onSearchDish(searchTerm, dishTypes[dayI], [dayI, mealI, dataAvailable[mealI] ? dataAvailable[mealI]["dishesLoc"]: mealI, mealHeader]) }}
                                                                                             placeholder="Meal not found; Type to find"
-                                                                                            onClear={() => {dishes[dayI][mealI][mealHeader] = ""; dishes[dayI][mealI][mealHeader + "Desc"] = ""; setDishes([...dishes]); setValidInput(false); }}
+                                                                                            onClear={() => {setValidInput(true); dishes[dayI][dataAvailable[mealI]["dishesLoc"]][mealHeader] = ""; dishes[dayI][dataAvailable[mealI]["dishesLoc"]][mealHeader + "Desc"] = ""; setDishes(dishes); setValidInput(false); }}
                                                                                         />
                                                                                     </div>
                                                                                     : <div
+                                                                                        key={dayI + "^" + mealI + "^" + mealHeader + "Desc"}
                                                                                         className={ dataAvailable[mealI] && dataAvailable[mealI][mealHeader + "Desc"] && parseInt(props.currWeeklyMeals[(dayI * 5) + mealIndex]) > 0 ? styles.fullCell : styles.emptyCell}
                                                                                         id={dayI + "^" + mealI + "^" + mealHeader + "Desc"}
                                                                                         onClick={(e) => { setActive(e.target.id) }}>
