@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
 import './componentCSS/SearchBox.module.css'
 // import '../index.css';
 import { Input, AutoComplete, Select } from 'antd';
@@ -10,20 +9,30 @@ function SearchBox({selectionCallback, label, dataSource}) {
 
     const [restText, setRestText] = useState("")
     const [options, setOptions] = useState([]);
+    const [value, setValue] = useState()
 
     const handleSearch = (value) => {
+      console.log(dataSource)
       var matches = []
-      dataSource.forEach( (stringValue) => {
-        var str = stringValue.toLowerCase();
-        var start = str.search(value.toLowerCase());
-        if(start !== -1) {
-          matches.push( [stringValue, start] )
-        }
-      })
-      // matches.push(["Añadir " + value, -1])
-      setOptions(value ? searchResult(value, matches) : []);
+      if(dataSource){
+        dataSource.forEach( (stringValue) => {
+          var str = stringValue.toLowerCase();
+          var start = str.search(value.toLowerCase());
+          if(start !== -1) {
+            matches.push( [stringValue, start] )
+          }
+        })
+        matches.push(["Añadir " + value, -1])
+        setOptions(value ? searchResult(value, matches) : []);
+      }
+
     };
     
+    function onSelect(e){
+      setValue("")
+      selectionCallback(e)
+    }
+
     return (
       <div>
         <AutoComplete
@@ -32,14 +41,14 @@ function SearchBox({selectionCallback, label, dataSource}) {
             width: 300,
           }}
           options={options}
-          onSelect={selectionCallback}
+          onSelect={onSelect}
           onSearch={handleSearch}
-          
+          value={value} onChange={(val) => {setValue(val)}}
         >
 
           <Input.Search 
             allowClear={true}
-            size="large" placeholder={label} enterButton />
+            size="large" placeholder={label}  enterButton />
           
         </AutoComplete>
       </div>

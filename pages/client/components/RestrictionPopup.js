@@ -8,7 +8,6 @@ const backendIP = "../../api"
 function RestrictionPopup({formCallback, restArr}) {
 
     const [restrictionTypes, setRestrictionTypes] = useState(null)
-    
     useEffect( () => {
         getRestTypes()
     }, [])
@@ -70,8 +69,9 @@ function RestrictionPopup({formCallback, restArr}) {
         })
         if (!alreadyAdded) {
             formCallback(restArr.concat([value]))
+        console.log(restArr.concat([value]))
+
         }
-        console.log(restArr)
     };
 
 
@@ -99,23 +99,5 @@ function RestrictionPopup({formCallback, restArr}) {
         </>
     );
 }
-
-// This function gets called at build time on server-side.
-// It may be called again, on a serverless function, if
-// revalidation is enabled and a new request comes in
-export async function getStaticProps() {
-    const res = await fetch('https://.../posts')
-    const posts = await res.json()
-  
-    return {
-      props: {
-        posts,
-      },
-      // Next.js will attempt to re-generate the page:
-      // - When a request comes in
-      // - At most once every 10 seconds
-      revalidate: 10, // In seconds
-    }
-  }
 
 export default RestrictionPopup;

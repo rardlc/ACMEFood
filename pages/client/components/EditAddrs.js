@@ -67,7 +67,6 @@ function EditAddrs({handleChange, clientId}){
         addrsPkg.addrs = addrs
         addrsPkg.dbPrimary = dbPrimary
         addrsPkg.dbAddrs = dbAddrs
-        console.log(addrsPkg)
         handleChange(addrsPkg)
     }, [addrs, primary, render])
 
@@ -95,7 +94,7 @@ function EditAddrs({handleChange, clientId}){
         if(addrs.length > 1){
             const found = addrs.find( element => element["AddrId"] === addrId)
             const index = addrs.indexOf(found)
-            console.log(index)
+
             if(addrsPkg["remove"]){
                 addrsPkg["remove"].push(addrs[index])
             } else {
@@ -109,7 +108,6 @@ function EditAddrs({handleChange, clientId}){
                 setPrimary(addrs[0]["AddrId"])
             }
             setAddrs([...addrs])
-            setAddrsPkg(addrsPkg)
         } else {
             alert("You need to have at least one primary address for each client")
         }
@@ -226,7 +224,6 @@ function EditAddrs({handleChange, clientId}){
         renderCell: (checked, record, index, originNode) => {
                 // //console.log(checked, record, index, originNode)
                 if(record["AddrId"] === primary){
-                    console.log("SETTING PRIMARY ADDR")
                     return (
                         <Radio checked={true}></Radio>
                     )

@@ -154,7 +154,7 @@ function EditMenu () {
         <Form className={styles.container} style={{"flexFlow": "flex"}}>
 
             <DatePicker style={{margin: "1rem"}} onChange={datePicked} picker="week"/>
-            <Button className={styles.submitMenu} name="submit" onClick={submitMenu}>Hacer Schedule</Button>
+            <Button className={styles.submitMenu} name="submit" onClick={submitMenu}>Hacer Itinerario</Button>
 
             {weekday ? null: <p>Escoje una semana para editar su menu...</p>}
 

@@ -4,15 +4,27 @@
   border-color: red;
   border-width:medium;
   border-style:solid;
+  border-width: 1px;
+  min-width: 100px;
+  
+
 }
 
 .fullCell {
   text-align: center;
-  border-left: grey;
+  border-color: grey;
   border-style: solid;
   border-width: 1px;
   padding: 0.5rem;
 
+}
+
+.innerCell {
+}
+
+.fullCell input {
+
+  min-width: 100px;
 }
 
 .tformat {

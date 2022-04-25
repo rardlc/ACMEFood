@@ -13,11 +13,16 @@ const backendIP = "../api"
 
 export default function Account({accountId, dbClients, clientId}){
     const [clients,setClients] = useState([])
+    const isSERVERPROCESSING = typeof window === "undefined"
     const [viewing, setViewing] = useState( () => {
-        const saved = localStorage.getItem("view")
-        return JSON.parse(saved) || ""
+        
+        if(isSERVERPROCESSING){
+            return ""
+        } else {
+            const saved = localStorage.getItem("view")
+            return JSON.parse(saved) || ""
         }
-    )
+    })
     const [forms, setForms] = useState([])
     const [newNum, setNewNum] = useState(0)
 

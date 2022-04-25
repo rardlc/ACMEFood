@@ -10,8 +10,8 @@ function EditWeeklyMenu({weeklyMenu, setWeeklyMenu}){
         setWeeklyMenu(weeklyMeals)
     },[])
 
-    const [dayLabels, setDayLabels] = useState(["Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
-    const [mealLabels, setMealLabels] = useState(["Breakfast", "Lunch", "Dinner", "Extra", "Snack"])
+    const [dayLabels, setDayLabels] = useState(["Domingo","Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado"])
+    const [mealLabels, setMealLabels] = useState(["Desayuno", "Almuerzo", "Comida", "Extra", "Merienda"])
     return (
         <div className={styles.mealContainer}>
             {

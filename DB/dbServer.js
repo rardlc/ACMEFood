@@ -55,7 +55,6 @@ const knex = require('knex')({
 
 
 
-
 //Start the mySQLjs connection
 const pool = new sql.createPool({
   host: 'localhost',
@@ -1570,7 +1569,7 @@ app.post('/setWeeklyMenus', (req, res) => {
                         (mealArr, day) => {
                           //we do 1 or more (depending on topLoopCount) SQL queries per day
                           let scheduleDay = thisWeek[day]
-                          
+
                           console.log(`SELECT * FROM Schedule WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}'`)
                           //checking whether this schedule for this client and day exists
                           pool.query(`SELECT * FROM Schedule WHERE ClientId='${client.ClientId}' AND Date='${scheduleDay}'`, (err, currentScheduleDay) => {
@@ -1620,32 +1619,36 @@ app.post('/setWeeklyMenus', (req, res) => {
 
                             //they do not have this date in their schedule (INSERT INTO)
                             else {
-                              //for this client, find out the max loop count in each meal of this person
-                              let topLoopCount = 1
+
                               let mealCountDict = {}
-                              // console.log("WeeklyMeal:", client["WeeklyMeal"]) 
-                              const clientMealWeek = client["WeeklyMeal"].substring(day * 5, day * 5 + 5) //this client's meals for this week
 
-                              // console.log(client)
-                              // console.log(client["WeeklyMeal"])
-                              // console.log(clientMealWeek)
+                              function getTopMealCount(expectedClientMeals) {
+                                //for this client, find out the max loop count in each meal of this person
+                                let topLoopCount = 1
+                                let totalMeals = 5
 
-                              mealCountDict[0] = parseInt(clientMealWeek.charAt(0))
-                              mealCountDict[1] = parseInt(clientMealWeek.charAt(1))
-                              mealCountDict[2] = parseInt(clientMealWeek.charAt(2))
-                              mealCountDict[3] = parseInt(clientMealWeek.charAt(3))
-                              mealCountDict[4] = parseInt(clientMealWeek.charAt(4))
+                                const clientMealWeek = expectedClientMeals.substring(day * totalMeals, day * totalMeals + totalMeals) //this client's meals for this week
 
-                              for (var i = 0; i < clientMealWeek.length; i++) {
-                                const currentMealAmount = parseInt(clientMealWeek.charAt(i))
+                                mealCountDict[0] = parseInt(clientMealWeek.charAt(0))
+                                mealCountDict[1] = parseInt(clientMealWeek.charAt(1))
+                                mealCountDict[2] = parseInt(clientMealWeek.charAt(2))
+                                mealCountDict[3] = parseInt(clientMealWeek.charAt(3))
+                                mealCountDict[4] = parseInt(clientMealWeek.charAt(4))
 
-                                if (currentMealAmount > topLoopCount) {
-                                  topLoopCount = currentMealAmount
+                                for (var i = 0; i < clientMealWeek.length; i++) {
+                                  const currentMealAmount = parseInt(clientMealWeek.charAt(i))
+
+                                  if (currentMealAmount > topLoopCount) {
+                                    topLoopCount = currentMealAmount
+                                  }
                                 }
-                              }
-                              console.log(scheduleDay)
-                              console.log(topLoopCount)
 
+                                return topLoopCount
+                              }
+
+                              let topLoopCount = getTopMealCount(client["WeeklyMeal"]);
+
+                              console.log(mealCountDict)
                               // make SQL queries for this day's meal as many times as this client's weeklyMeal says
                               //we do 1 or more (depending on topLoopCount) SQL queries per day
                               for (var i = 1; i <= topLoopCount; i++) {
@@ -1682,10 +1685,10 @@ app.post('/setWeeklyMenus', (req, res) => {
 
                                 let q = `INSERT INTO Schedule (Date, ClientId, BFast, Lunch, Dinner, Extra, Snack, AddrId) VALUES 
                                 ('${scheduleDay}', '${client.ClientId}', '${sqlDishStrings[0]}','${sqlDishStrings[1]}','${sqlDishStrings[2]}','${sqlDishStrings[3]}','${sqlDishStrings[4]}', '${clientRestAddrInfo[0]["AddrId"]}')`
-                                  console.log(q)
-                                  pool.query(q)
-                                }
-                              } // end of "for this day, write some sql queries"
+                                console.log(q)
+                                pool.query(q)
+                              }
+                            } // end of "for this day, write some sql queries"
                           })
                           //check whether the records for this day exist, if they do exist:
                           // - UPDATE each record that appeared
@@ -1862,10 +1865,13 @@ app.post('/clearSession', (req, res) => {
       res.sendStatus(500)
     }
   )
-
 })
 
 app.post('/setClientChanges', (req, res) => {
+  //input
+  console.log(req.body)
+
+
   var clientInfo = req.body.basic
   var restChanges = req.body.rest
   var cal = req.body.cal
@@ -2101,46 +2107,55 @@ app.post('/setClientChanges', (req, res) => {
   //TODO cal should only change for the > 1's in the DB's WeeklyMenu. Make sure to check this here.
   if (cal) {
 
+    /*TODO:
+      1. DELETE all rows in this Calendar's Date
+      2. INSERT all rows in Cal
+    */
     pool.execute('SELECT Active, WeeklyMeal FROM Clients WHERE ClientId= ? ', [clientId], (err, dbClientInfo) => {
 
-      cal.forEach(
-        //setting Schedule to changes in Calendar.js
-        (col, dayI) => {
-
-
-          console.log(col[0]["Date"])
-          console.log("--------------------")
-          col.forEach(
-            (mealInDay) => {
-              if (weeklyMeals[(dayI * 5) + 0] === "0") {
-                mealInDay["BFast"] = ""
+      pool.execute(`DELETE FROM Schedule WHERE ClientId=? AND Date BETWEEN ${week[0]} AND ${week[week.length - 1]}`, [clientId], (err) => {
+        cal.forEach(
+          //setting Schedule to changes in Calendar.js
+          (day, dayI) => {
+  
+            console.log(day[0]["Date"])
+            console.log("--------------------")
+  
+            let dayAddress = day[0]["AddrId"]
+  
+            day.forEach(
+              (entry) => {
+                if (weeklyMeals[(dayI * 5) + 0] === "0") {
+                  entry["BFast"] = ""
+                }
+                if (weeklyMeals[(dayI * 5) + 1] === "0") {
+                  entry["Lunch"] = ""
+                }
+                if (weeklyMeals[(dayI * 5) + 2] === "0") {
+                  entry["Dinner"] = ""
+                }
+                if (weeklyMeals[(dayI * 5) + 3] === "0") {
+                  entry["Extra"] = ""
+                }
+                if (weeklyMeals[(dayI * 5) + 4] === "0") {
+                  entry["Snack"] = ""
+                }
+                if (entry["EntryId"] > 0) {
+                  pool.execute("UPDATE Schedule SET BFast=?, Lunch=?, Dinner=?, Extra=?, Snack=?, AddrId=? WHERE ClientId=? AND Date=? AND EntryId=?", [entry["BFast"], entry["Lunch"], entry["Dinner"], entry["Extra"], entry["Snack"], dayAddress, clientId, dateFormatSQL(new Date(entry["Date"])), entry["EntryId"]], (err, v) => { if (err) console.log(err) })
+                } else {
+                  console.log("ADDING NEW SCHEDULE ENTRY...")
+                  console.log(entry)
+                  pool.execute("INSERT INTO Schedule (ClientId,Bfast,Lunch,Dinner,Extra,Snack,AddrId,Date) VALUES (?,?,?,?,?,?,?,?)", [clientId, entry["BFast"], entry["Lunch"], entry["Dinner"], entry["Extra"], entry["Snack"], entry["AddrId"], week[dayI]], (err) => { if (err) console.log(err) })
+                }
+  
               }
-              if (weeklyMeals[(dayI * 5) + 1] === "0") {
-                mealInDay["Lunch"] = ""
-              }
-              if (weeklyMeals[(dayI * 5) + 2] === "0") {
-                mealInDay["Dinner"] = ""
-              }
-              if (weeklyMeals[(dayI * 5) + 3] === "0") {
-                mealInDay["Extra"] = ""
-              }
-              if (weeklyMeals[(dayI * 5) + 4] === "0") {
-                mealInDay["Snack"] = ""
-              }
-              console.log(mealInDay)
-              if (mealInDay["EntryId"] > 0){
-                pool.execute("UPDATE Schedule SET BFast=?, Lunch=?, Dinner=?, Extra=?, Snack=?, AddrId=? WHERE ClientId=? AND Date=? AND EntryId=?", [mealInDay["BFast"], mealInDay["Lunch"], mealInDay["Dinner"], mealInDay["Extra"], mealInDay["Snack"], mealInDay["AddrId"] === "" ? -1 : mealInDay["AddrId"], clientId, dateFormatSQL( new Date(mealInDay["Date"]) ), mealInDay["EntryId"]], (err, v) => { if (err) console.log(err) })
-              } else {
-                pool.execute("INSERT INTO Schedule (ClientId,Bfast,Lunch,Dinner,Extra,Snack,AddrId,Date) VALUES (?,?,?,?,?,?,?,?)", [clientId, mealInDay["BFast"], mealInDay["Lunch"], mealInDay["Dinner"], mealInDay["Extra"], mealInDay["Snack"], mealInDay["AddrId"] === "" ? -1 : mealInDay["AddrId"], week[dayI]], (err) => { if (err) console.log(err) })
-              }
-
-            }
-          )
-        }
-      )
+            )
+          }
+        )
+      });
     })
   }
-
+  console.log("SUCCESSFULLY FINISHED WITH CAL!")
   //TODO weeklyMeals should not be changed here. It should be changed on a successful payment
   if (weeklyMeals) {
     // var basicQ = "UPDATE Clients Set WeeklyMeal='" + weeklyMeals + "' WHERE ClientId='" + clientId + "'"
@@ -2261,7 +2276,7 @@ app.post('/setClientChanges', (req, res) => {
   }
 
   res.send("Great")
-})
+}) //end
 
 app.post('/setDish', (req, res) => {
   ////////console.log(req.body)
@@ -2773,7 +2788,7 @@ app.post('/getClientSchedule', (req, res) => {
       q += "Date='" + sqlD + "')"
     }
   })
-  q += " AND S.ClientId ='" + clientId + "' ORDER BY Date"
+  q += " AND S.ClientId ='" + clientId + "' ORDER BY Date, EntryId"
   console.log(q)
   pool.query(q, (err, dbD) => {
     res.send(dbD)

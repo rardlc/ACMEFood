@@ -5,16 +5,66 @@
     flex-flow: row, wrap;
 }
 
+.newAccountModal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */ 
+}
+
+.visible{
+    display: flex;
+}
+
+.modalContent {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+  }
+
 .sidebar {
     min-height: 100vh;
-    border-right: #00d084 1px solid;
+    border-right: rgba(17, 16, 16, 0.856) 1px solid;
     min-width: 10%;
+}
+
+.sidebar > .sidebarOption {
+    border-bottom: 1px solid;
+    border-top: 1px solid;
+
+}
+
+.sidebar > .sidebarOption ~ .sidebarOption {
+    border-bottom: 1px solid;
+    border-top: none;
 }
 
 .sidebarOption {
     padding: 1rem;
-    border-bottom: #00d084 1px solid;
-    
+    font-size: 1rem;
+    cursor: pointer;
+    display: block;
+}
+
+.sidebarOption {
+    padding: 1rem;
+    font-size: 1rem;
+    border-bottom: 1px solid;
+    cursor: pointer;
+    display: block;
+}
+
+.sidebarOption:hover {
+    padding: 1rem;
+    background-color: #00e792;
+    color: white;
 }
 
 .active {
@@ -30,14 +80,15 @@
 .appLogo {
     display: flex;
     flex-flow: column wrap;
+    min-width: fit-content;
 }
 
-.addClientBtn span{
-    outline: 1px solid #00d084;
-    border-radius: 100px;
-    padding: 0.5rem;
-    margin: 0.5rem;
+.appLogo img{
+    max-width:100%;
+    max-height:100%;
 }
+
+
 
 .visible {
     display: flex;
@@ -51,15 +102,66 @@
     background: #00d084;
 }
 
-.addClientBtn span:hover{
-    background: #00d084;
-    box-shadow: 5px 5px 5px lightgreen;
+
+
+.btnControl {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: center;
+
+    
 }
 
-.addClientBtn {
+.circleBtn span{
+    outline: 1px solid rgba(17, 16, 16, 0.856);
+    border-radius: 100px;
+    background: rgba(17, 16, 16, 0.856);
+    transition: all 0.1s;
+    overflow: hidden;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5em;
+
+    cursor: pointer;
+
+
+
+}
+
+.circleBtn {
+    margin-top: 0.5rem;
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-flow: column wrap;
+}
+
+.btnControl p{
+    font-size: x-small;
+}
+
+.circleBtn:hover {
+    color: #00d084;
+    cursor: pointer;
+}
+
+.circleBtn:hover span {
+    background-color: #00d084;
+}
+
+.circleBtn img {
+    width: 3em;
+    height: 3em;
+    
+}
+
+.circleBtn span:hover{
+    background:#00d084;
+    color: white;
+
+    transition: all 0.1s;
 }
 
 

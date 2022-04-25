@@ -5,20 +5,40 @@ import ClientForm from "./ClientForm.js"
 
 import { Button, Form } from 'antd';
 import { userFromRequest } from "../../DB/tokens"
-import router from "next/router"; 
+import router from "next/router";
 
 const accountSearchParam = 'clid'
 
 const backendIP = "../api"
 
-export default function Account({accountId, dbClients}){
+export default function Account({accountId, dbClients, clientId}){
     const [clients,setClients] = useState([])
+    const isSERVERPROCESSING = typeof window === "undefined"
     const [viewing, setViewing] = useState( () => {
-        const saved = localStorage.getItem("view")
-        return JSON.parse(saved) || ""
+        
+        if(isSERVERPROCESSING){
+            return ""
+        } else {
+            const saved = localStorage.getItem("view")
+            return JSON.parse(saved) || ""
+        }
     })
     const [forms, setForms] = useState([])
     const [newNum, setNewNum] = useState(0)
+
+
+    useEffect( () => {
+        console.log("I loaded right now.")
+    },[])
+
+    function newClient(){
+        clients.push({ClientId: newNum, FormName: "CLForm" + newNum ,FistName: "New", LastName: "Client " + newNum})
+        setViewing(newNum)
+        setNewNum(newNum - 1)
+        setClients([...clients])
+        window.scrollTo(0, 0)
+        
+    }
 
     useEffect(
         () => {
@@ -28,14 +48,6 @@ export default function Account({accountId, dbClients}){
             }
         }
     ,[viewing])
-
-    function newClient(){
-        clients.push({ClientId: newNum, FormName: "CLForm" + newNum ,FistName: "New", LastName: "Client " + newNum})
-        console.log(clients)
-        setViewing(newNum)
-        setNewNum(newNum - 1)
-        setClients([...clients])
-    }
 
 
     function addForm(formObject) {
@@ -53,15 +65,17 @@ export default function Account({accountId, dbClients}){
             if(notRepeated){
                 forms.push(formObject)
                 setForms([...forms])
-
-                let newClientName = formObject.getFieldValue("fname") + " " + formObject.getFieldValue("lname")
-                console.log(formObject.getFieldValue("fname"))
+                
             }
 
 
         } else {
             forms.push(formObject)
             setForms([...forms])
+
+
+            
+
         }
 
     }
@@ -78,17 +92,35 @@ export default function Account({accountId, dbClients}){
         }
 
     }
-
+    useEffect(() => {
+        console.log(viewing)
+    }, [viewing])
     // Get all Clients data from the url on page entry
     useEffect(() => {
+        console.log(dbClients)
         if(dbClients) {
-
             console.log(dbClients)
             setClients(dbClients)
         }
         
         
-    },[])
+    },[accountId,dbClients])
+
+    // Whenever clients changes, make a ClientForm object for each
+    // useEffect( () => {
+
+    //     if (clients.length > 0) {
+    //         setViewing(clients[0]["ClientId"])
+    //         console.log(forms)
+    //     }
+
+    // },[clients])
+
+    useEffect ( () => {
+        if(clientId){
+            setViewing(clientId)
+        }
+    },[clientId])
 
     function handleLogout(){
         axios({
@@ -106,22 +138,11 @@ export default function Account({accountId, dbClients}){
                     accountFormView["FistName"] = values["fname"]
                     accountFormView["LastName"] = values["lname"]
                     clients[formIndex] = accountFormView
-                    console.log()
                     setClients([...clients])
                 }
             }
         )
     }
-
-
-    // Whenever clients changes, make a ClientForm object for each
-    useEffect( () => {
-        if (clients.length > 0) {
-            setViewing(clients[0]["ClientId"])
-            console.log(forms)
-        }
-
-    },[clients])
 
     return(
         <div> 
@@ -134,20 +155,32 @@ export default function Account({accountId, dbClients}){
                     <div className={styles.sidebar}>
                         <div className={styles.appLogo}>
                             <img src="../logo.png" width="250" height="100"/>
-                            <p className={styles.title}> People on this account </p>
                         </div>
                         {clients.map(
                             clInfo => {
-                                return (<div key={"sidebarOption" + clInfo["ClientId"]} className={viewing === clInfo["ClientId"] ? styles.sidebarOption + " " + styles.active : styles.sidebarOption} onClick={ () => { setViewing(clInfo["ClientId"]) }}>
+                                return (<div tabindex={0} key={"sidebarOption" + clInfo["ClientId"]} className={viewing === clInfo["ClientId"] ? styles.sidebarOption + " " + styles.active : styles.sidebarOption} onKeyDown={(e) => { e.key === 'Enter' || e.key === ' ' ? setViewing(clInfo["ClientId"]) : null }} onClick={ () => { setViewing(clInfo["ClientId"]) }}>
                                     {clInfo["FistName"] + " " + clInfo["LastName"]}
                                 </div>)
                             }
                         )}
-                        <div className={styles.addClientBtn} onClick={newClient}>
-                            <span>&#10133;</span>
-                        </div>
-                        <Button onClick={() => {saveAllForms()}}>Save all Forms</Button>
-                        <Button onClick={() => {handleLogout()}}>Logout</Button>
+
+                        <nav tabindex={0} className={styles.btnControl}>
+                            <div tabindex={0} className={styles.circleBtn}  onKeyDown={(e) => { e.key === 'Enter' || e.key === ' ' ? newClient : false}} onClick={newClient}>
+                                {/* <span>&#10133;</span> */}
+                                <span><img src="../user-plus-solid-white.svg"></img></span>
+                                <p>Clienté Nuevo</p>
+                            </div>
+
+                            <div tabindex={0} className={styles.circleBtn} onKeyDown={(e) => { e.key === 'Enter' || e.key === ' ' ? saveAllForms() : false}} onClick={() => {saveAllForms()}}><span><img src="../floppy-disk-solid-white.svg"></img></span>
+                            
+                            <p>Salvar a Todos</p>
+                            
+                            </div>
+                            <div tabindex={0} className={styles.circleBtn} onKeyDown={(e) => { e.key === 'Enter' || e.key === ' ' ? handleLogout() : false}} onClick={() => {handleLogout()}}><span><img src="../door-open-solid-white.svg"></img></span>
+                            <p>Cerrar Sesión</p>
+                            </div>
+                        </nav>
+
 
                     </div>
 
@@ -156,7 +189,7 @@ export default function Account({accountId, dbClients}){
                         {clients.map(
                             clInfo => {
                                 // console.log(clInfo)
-                                return (<div className={ viewing === clInfo["ClientId"] ? styles.visible : styles.hide }><ClientForm accountId={accountId} key={"CLForm" + clInfo["ClientId"]} formName={"CLForm" + clInfo["ClientId"]} addFormToParent={addForm} ClientId={clInfo["ClientId"]}></ClientForm></div>)
+                                return (<div  className={ viewing === clInfo["ClientId"] ? styles.visible : styles.hide }> {viewing === clInfo["ClientId"] ? <ClientForm accountId={accountId} key={"CLForm" + clInfo["ClientId"]} formName={"CLForm" + clInfo["ClientId"]} addFormToParent={addForm} ClientId={clInfo["ClientId"]}></ClientForm> :null}</div>)
                             }
                         )}
                         </Form.Provider>
@@ -179,13 +212,13 @@ export async function getServerSideProps(context){
     if (!account) return {
         redirect: {
           destination: "/",
-          permanent: false  
+          permanent: false
         }
       }
 
     if (account.accountId === 34){
         return {redirect: { 
-            destination: "/admin/dashboard",
+            destination: "/admin/account",
             permanent: false
             }
         }
